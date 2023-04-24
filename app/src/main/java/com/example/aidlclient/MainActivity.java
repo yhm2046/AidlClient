@@ -15,6 +15,8 @@ import android.view.View;
 import com.example.aidlclient.databinding.ActivityMainBinding;
 import com.example.aidlserver.IMyAidlInterface;
 
+import java.util.List;
+
 /**
  * 客户端aidl测试
  */
@@ -62,10 +64,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
 
-                    String st= myAidlInterface.get15RandomStringPhrase(8,"123abc");
+                    List windSpeed= myAidlInterface.getAirWindSpeed(0,0,0,"null");
 //                    String st= myAidlInterface.getStr() + i++;
-                    Log.i(TAG,"Click st:" + st);
-                    activityMainBinding.tvShow.setText(st);
+                    String showText = windSpeed.get(1).toString();
+                    Log.i(TAG,"Click st:" + windSpeed);
+                    activityMainBinding.tvShow.setText(showText);
                 } catch (RemoteException e) {
                     Log.i(TAG,"onclick error:" + e);
                     e.printStackTrace();
