@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -14,39 +15,53 @@ import com.example.aidlserver.IDataService;
 import com.example.aidlserver.IDataServiceCallback;
 
 /**
- * 客户端被动接收
+ * 客户端主动轮询,发送数据
  */
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "client-MainActivity:xwg";
+public class MainActivityPolling extends AppCompatActivity {
+    private static final String TAG = "client-MainActivityPolling:xwg";
     private IDataService mService;
-    private IDataServiceCallback mCallback = new IDataServiceCallback.Stub() {
+
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
         @Override
-        public void onMessageReceived(String message) { //收到客户端的回调
-            Log.d(TAG, "Received from server: " + message);
-            try {
-                mService.sendMessage("send to server: " + message);
-            } catch (RemoteException e) {
-                e.printStackTrace();
+        public void run() {
+            if (mService != null) {
+                try {
+                    String message = "485 date-" + System.currentTimeMillis();
+                    mService.sendMessage(message);
+                    Log.i(TAG,"client send to server:" + message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
+            mHandler.postDelayed(this, 2 * 1000);
         }
     };
+
+    private IDataServiceCallback mCallback = new IDataServiceCallback.Stub() {
+        @Override
+        public void onMessageReceived(String message) {
+            Log.d(TAG, "Received message from server: " + message);
+        }
+    };
+
+
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected! " );
+            String message = "onServiceConnected success!";
             mService = IDataService.Stub.asInterface(service);
             try {
                 mService.registerCallback(mCallback);
             } catch (RemoteException e) {
-                Log.d(TAG, "onServiceConnected exception: " + e );
                 e.printStackTrace();
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected! " );
+            String message = "onServiceDisconnected success!";
             mService = null;
         }
     };
@@ -55,9 +70,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Intent intent = new Intent();
-        intent.setClassName("com.example.aidlserver", "com.example.aidlserver.DataService");
+        intent.setClassName("com.example.aidlserver", "com.example.aidlserver.DataServiceNoPolling");
         bindService(intent, mConnection, BIND_AUTO_CREATE);
+
+        mHandler.postDelayed(mRunnable, 2000);
     }
 
     @Override
@@ -71,5 +89,7 @@ public class MainActivity extends AppCompatActivity {
             }
             unbindService(mConnection);
         }
+        mHandler.removeCallbacks(mRunnable);
     }
 }
+
