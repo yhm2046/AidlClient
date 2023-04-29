@@ -32,8 +32,9 @@ public class TestMSGActivity extends AppCompatActivity {
 
         //绑定远端服务
         Intent intent = new Intent();
-        intent.setPackage("com.example.aidlserver");
-        intent.setAction("com.example.timerservice.action");
+//        intent.setPackage("com.example.aidlserver");
+//        intent.setAction("com.example.timerservice.action");
+        intent.setClassName("com.example.aidlserver", "com.example.aidlserver.TimerService");    //调用远端服务
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         activityMainBinding.button.setOnClickListener(new View.OnClickListener() {
