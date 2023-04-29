@@ -2,11 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.aidlclient">
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
+
     <queries>
-        <package android:name="com.example.aidlserver"/>
+        <package android:name="com.example.aidlserver" />
     </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,13 +19,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AidlClient">
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".TestMSGActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
         </activity>
     </application>
 
